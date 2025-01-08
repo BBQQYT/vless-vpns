@@ -1,0 +1,126 @@
+{
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "local-dns",
+        "address": "8.8.8.8",
+        "detour": "direct-out"
+      },
+      {
+        "tag": "cloudflare-dns",
+        "address": "https://1.1.1.1/dns-query",
+        "address_resolver": "local-dns",
+        "detour": "vless-out"
+      }
+    ],
+    "rules": [
+      {
+        "rule_set": "antizapret",
+        "server": "cloudflare-dns"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "inet4_address": "172.16.0.1/30",
+      "auto_route": true,
+      "strict_route": true,
+      "sniff": true,
+      "domain_strategy": "prefer_ipv4"
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct-out"
+    },
+    {
+      "type": "vless",
+      "tag": "vless-out",
+      "server": "138.124.115.5",
+      "server_port": 39364,
+      "uuid": "1a9e8006-c836-4ddc-bc6c-e6919aef1b46",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "yahoo.com",
+        "utls": {
+          "enabled": true
+        },
+        "reality": {
+          "enabled": true,
+          "public_key": "J8PvgnCW2b9PZnJ3nW3M2E00de5rTt5SLTxg_E5zgGk",
+          "short_id": "9d9f372c6a"
+        }
+      }
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "rule_set": "antizapret",
+        "outbound": "vless-out"
+      },
+      {
+        "outbound": "vless-out",
+        "process_name": [
+          "Discord.exe",
+          "Telegram.exe"
+        ]
+      },
+      {
+        "domain_suffix": [
+          "nordvpn.com",
+          "ip-api.com",
+          ".youtube.com",
+          ".googlevideo.com",
+          ".nhacmp3youtube.com",
+          ".1e100.net",
+          ".ytimg.com",
+          ".youtu.be",
+          ".google.com",
+          ".gvt1.com",
+          ".googleusercontent.com",
+          ".googleapis.com",
+          ".gstatic.com",
+          "speedtest.net"
+        ],
+        "outbound": "vless-out"
+      },
+      {
+        "ip_cidr": [
+          "213.136.63.73/32"
+        ],
+        "outbound": "vless-out"
+      },
+      {
+        "protocol": "dns",
+        "outbound": "dns-out"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "antizapret",
+        "format": "binary",
+        "url": "https://github.com/savely-krasovsky/antizapret-sing-box/releases/latest/download/antizapret.srs",
+        "download_detour": "vless-out"
+      }
+    ],
+    "auto_detect_interface": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true
+    }
+  }
+}
